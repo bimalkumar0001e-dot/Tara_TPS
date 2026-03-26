@@ -345,7 +345,7 @@ const App: React.FC = () => {
     <div
   className="flex flex-col h-screen w-full text-white overflow-hidden relative font-outfit"
   style={{
-    background: "url('tps.png') center center / cover no-repeat",
+   background: "url('/tps.png') center center / cover no-repeat",
     minHeight: '100vh'
   }}
 >

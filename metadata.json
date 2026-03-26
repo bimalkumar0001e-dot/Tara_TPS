@@ -1,0 +1,8 @@
+{
+  "name": "Tara - Tagore Public School AI Teacher",
+  "description": "Personal AI teacher for Tagore Public School students. Tara speaks Hindi and English with a sweet Indian accent, supports PDF uploads, and provides concise, engaging lessons.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}

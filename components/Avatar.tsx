@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, useEffect } from 'react';
 import { AudioFeatures } from '../App';
 
@@ -6,9 +5,10 @@ interface AvatarProps {
   isSpeaking: boolean;
   isListening: boolean;
   audioFeatures: AudioFeatures;
+  avatarImage?: string;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isListening, audioFeatures }) => {
+const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isListening, audioFeatures, avatarImage }) => {
   const { volume, low, mid, high, energy, brightness } = audioFeatures;
 
   const [isBlinking, setIsBlinking] = useState(false);
@@ -26,7 +26,7 @@ const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isListening, audioFeatures 
     return () => clearTimeout(blinkTimer);
   }, []);
 
-  // Idle movement & Wing flapping
+  // Idle movement
   useEffect(() => {
     const interval = setInterval(() => {
       const time = Date.now();
@@ -60,23 +60,65 @@ const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isListening, audioFeatures 
   }, [isSpeaking, low, mid, emotion.smile]);
 
   return (
-    <div className="relative w-full max-w-md aspect-[4/5] flex items-center justify-center scale-110">
-      {/* Background Petals/Bokeh Effect */}
-      <div className="absolute inset-0 pointer-events-none">
-         <div className="absolute top-[20%] left-[10%] w-4 h-4 bg-blue-300/20 blur-sm rounded-full animate-ping" />
-         <div className="absolute bottom-[20%] right-[10%] w-6 h-6 bg-slate-300/20 blur-md rounded-full animate-pulse" />
-      </div>
+    <div className="relative flex items-center justify-center w-full h-full">
+      {/* Enhanced Bottom Glow Effect (Behind avatar) */}
+      <div 
+        className="absolute w-full h-64 -bottom-16 left-1/2 transform -translate-x-1/2 pointer-events-none"
+        style={{
+          background: isSpeaking 
+            ? 'radial-gradient(ellipse 600px 300px at center, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.2) 40%, transparent 80%)'
+            : 'radial-gradient(ellipse 600px 300px at center, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.05) 40%, transparent 80%)',
+          filter: 'blur(40px)',
+          transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+          transform: `translateX(-50%) scaleX(${isSpeaking ? 1.1 : 1.0}) scaleY(${isSpeaking ? 1.1 : 1.0})`,
+          zIndex: -1
+        }}
+      />
 
-      <svg viewBox="0 0 400 500" className="w-full h-full drop-shadow-[0_20px_80px_rgba(59,130,246,0.1)] overflow-visible">
+      {/* Main Avatar Container - Rounded Square Frame - MINIMIZED LIKE RYAN */}
+      <div 
+        className="relative flex items-center justify-center transition-all duration-300"
+        style={{
+          width: 'min(70vw, 600px)',
+          height: 'min(70vh, 600px)',
+          borderRadius: '40px',
+          background: 'rgba(0, 0, 0, 0.4)',
+          border: isSpeaking ? '2px solid rgba(59, 130, 246, 0.4)' : '2px solid rgba(59, 130, 246, 0.15)',
+          backdropFilter: 'blur(15px)',
+          boxShadow: isSpeaking 
+            ? '0 0 40px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.1)'
+            : '0 0 20px rgba(59, 130, 246, 0.1)',
+          transform: isSpeaking ? 'scale(1.05)' : 'scale(1.0)',
+          overflow: 'hidden',
+          padding: '0'
+        }}
+      >
+        {/* Avatar Content */}
+        <div 
+          className="w-full h-full flex items-center justify-center relative"
+          style={{
+            transform: isSpeaking ? 'scale(0.99)' : 'scale(1)',
+            transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+          }}
+        >
+          {/* Display avatar image if provided, otherwise use SVG */}
+          {avatarImage ? (
+            <img 
+              src={avatarImage} 
+              alt="Avatar" 
+              className="w-full h-full object-cover transition-all duration-300"
+              style={{
+                filter: isSpeaking 
+                  ? 'brightness(1.08) contrast(1.05) drop-shadow(0 0 20px rgba(59, 130, 246, 0.3))' 
+                  : 'brightness(1.05) contrast(1.05)',
+              }}
+            />
+          ) : (
+      <svg viewBox="0 0 400 500" className="w-full h-full overflow-visible" style={{ maxWidth: '100%', maxHeight: '100%' }}>
         <defs>
           <linearGradient id="hairGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#1e293b" />
             <stop offset="100%" stopColor="#0f172a" />
-          </linearGradient>
-          <linearGradient id="wingGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="rgba(255,192,203,0.1)" />
-            <stop offset="50%" stopColor="rgba(255,255,255,0.6)" />
-            <stop offset="100%" stopColor="rgba(216,180,254,0.1)" />
           </linearGradient>
           <filter id="glow">
             <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
@@ -87,17 +129,13 @@ const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isListening, audioFeatures 
         </defs>
 
         <g style={{ transform: `translateY(${idleState.bounce}px) rotate(${idleState.tilt}deg)`, transformOrigin: '200px 480px', transition: 'transform 0.2s ease-out' }}>
-          
           {/* Hair Back */}
           <path d="M100 160 Q200 80 300 160 L320 430 Q200 460 80 430 Z" fill="url(#hairGrad)" />
 
-          {/* Body (Teacher Outfit - Blazer/Shirt) */}
+          {/* Body */}
           <g>
-            {/* Shirt/Blouse */}
             <path d="M120 400 L280 400 L320 500 L80 500 Z" fill="#ffffff" />
-            {/* Blazer/Jacket */}
             <path d="M120 400 Q200 390 280 400 L350 500 L240 500 L200 440 L160 500 L50 500 Z" fill="#1e293b" />
-            {/* Tie/Scarf */}
             <path d="M190 400 L210 400 L205 460 L195 460 Z" fill="#ef4444" />
           </g>
 
@@ -107,16 +145,14 @@ const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isListening, audioFeatures 
           {/* Face */}
           <path d="M135 180 Q135 380 200 380 Q265 380 265 180 Q265 110 200 110 Q135 110 135 180 Z" fill="#fff5f5" />
 
-          {/* Eyes (Deep Blue) */}
+          {/* Eyes */}
           <g className={isBlinking ? 'blink-active' : ''} style={{ transformOrigin: '200px 220px' }}>
             <g style={{ transform: `translate(${idleState.eyeX}px, ${idleState.eyeY}px)`, transition: 'transform 0.5s cubic-bezier(0.2, 0, 0.2, 1)' }}>
-              {/* Left Eye */}
               <g transform="translate(175, 220)">
                 <ellipse cx="0" cy="0" rx="14" ry={18 - emotion.eyeSquint*4} fill="#222" />
                 <circle cx="0" cy="0" r="10" fill="#1d4ed8" opacity="0.8" />
                 <circle cx="4" cy="-5" r="4" fill="white" opacity="0.9" />
               </g>
-              {/* Right Eye */}
               <g transform="translate(225, 220)">
                 <ellipse cx="0" cy="0" rx="14" ry={18 - emotion.eyeSquint*4} fill="#222" />
                 <circle cx="0" cy="0" r="10" fill="#1d4ed8" opacity="0.8" />
@@ -141,20 +177,29 @@ const Avatar: React.FC<AvatarProps> = ({ isSpeaking, isListening, audioFeatures 
             )}
           </g>
 
-          {/* Hair Front (Purple/Lavender bangs) */}
+          {/* Hair Front */}
           <g fill="url(#hairGrad)">
             <path d="M135 150 Q200 110 265 150 Q250 190 230 165 Q200 215 170 165 Q150 190 135 150 Z" />
-            {/* Side strands */}
             <path d="M135 150 L120 370 Q130 390 150 360 Z" />
             <path d="M265 150 L280 370 Q270 390 250 360 Z" />
           </g>
         </g>
       </svg>
-      
-      {/* Academic Circle Glow (behind avatar) */}
-      <div className="absolute inset-0 -z-10 flex items-center justify-center">
-        <div className={`w-64 h-64 border border-blue-400/20 rounded-full animate-[spin_10s_linear_infinite] ${isSpeaking ? 'opacity-40' : 'opacity-10'}`} />
-        <div className={`absolute w-72 h-72 border border-slate-400/10 rounded-full animate-[spin_15s_linear_infinite_reverse] ${isSpeaking ? 'opacity-30' : 'opacity-5'}`} />
+          )}
+        </div>
+
+        {/* Animated Border Glow Effect */}
+        <div 
+          className="absolute inset-0 rounded-[40px] pointer-events-none"
+          style={{
+            border: '1px solid',
+            borderColor: isSpeaking ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.05)',
+            boxShadow: isSpeaking
+              ? 'inset 0 0 15px rgba(59, 130, 246, 0.1)'
+              : 'none',
+            transition: 'all 0.4s ease-out'
+          }}
+        />
       </div>
     </div>
   );

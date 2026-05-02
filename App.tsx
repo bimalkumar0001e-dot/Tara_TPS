@@ -53,6 +53,7 @@ const App: React.FC = () => {
   const [slides, setSlides] = useState<string[]>([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [timerValue, setTimerValue] = useState<number | null>(null);
+  const [avatarImage, setAvatarImage] = useState<string | null>('/tara-avatar.png');
 
   const inputAudioCtx = useRef<AudioContext | null>(null);
   const outputAudioCtx = useRef<AudioContext | null>(null);
@@ -153,7 +154,7 @@ const App: React.FC = () => {
           const arrayBuffer = await file.arrayBuffer();
           const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
           
-          for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, 10); pageNum++) {
+          for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, 100); pageNum++) {
             const page = await pdf.getPage(pageNum);
             const viewport = page.getViewport({ scale: 1.5 });
             const canvas = document.createElement('canvas');
@@ -221,7 +222,7 @@ const App: React.FC = () => {
             setView('active-session');
             const source = inputAudioCtx.current!.createMediaStreamSource(stream);
             // Assign to ref to prevent garbage collection
-            scriptProcessorRef.current = inputAudioCtx.current!.createScriptProcessor(4096, 1, 1);
+            scriptProcessorRef.current = inputAudioCtx.current!.createScriptProcessor(2048, 1, 1);
             
             scriptProcessorRef.current.onaudioprocess = (e) => {
               if (isSessionClosing.current) return;
@@ -446,7 +447,7 @@ const App: React.FC = () => {
           <div className="w-full h-full flex flex-row items-center justify-center px-12 gap-12 animate-in fade-in duration-1000">
             <div className={`flex flex-col items-center transition-all duration-500 ${activeMode === 'teacher' ? 'w-1/3' : 'w-full'}`}>
             <div className="relative w-[32rem] h-[32rem]">
-  <Avatar isSpeaking={isSpeaking} isListening={isListening} audioFeatures={audioFeatures} />
+  <Avatar isSpeaking={isSpeaking} isListening={isListening} audioFeatures={audioFeatures} avatarImage={avatarImage || undefined} />
                 {timerValue !== null && (
                   <div className="absolute bottom-[-10px] left-1/2 -translate-x-1/2 px-6 py-1.5 bg-blue-600 rounded-full font-bold text-lg tabular-nums shadow-[0_0_20px_#2563eb]">
                     {Math.floor(timerValue/60)}:{String(timerValue%60).padStart(2,'0')}

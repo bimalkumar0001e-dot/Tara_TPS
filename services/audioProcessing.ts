@@ -1,13 +1,8 @@
-
 import { Blob } from '@google/genai';
 
 export function encode(bytes: Uint8Array): string {
-  let binary = '';
-  const len = bytes.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
+  const binString = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
+  return btoa(binString);
 }
 
 export function decode(base64: string): Uint8Array {
